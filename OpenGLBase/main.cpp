@@ -74,13 +74,16 @@ void drawAxes()
 }
 void drawScene()
 {
+
 	glPushMatrix();
-	
 	
 	gluLookAt(x, y, z, //camera is located at (x,y,z)
 		0, 0, 0, //camera is looking at (0,0,0)
 		0.0f, 1.0f, 0.0f); //up vector is (0,1,0) (positive Y)
 	
+	if (showAxis) drawAxes(); // draw axes
+
+
 	// Draw the upper body at the orgin
 	solidBox(BODY_WIDTH, BODY_HEIGHT, BODY_DEPTH);
 	// Draw the upper arm, rotated shoulder degrees about the z-axis. Note that
@@ -181,7 +184,6 @@ void display() {
 	if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else           glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	if (showAxis) drawAxes(); // draw axes
 	drawScene(); // draw a robot
 	glFlush();
 }
@@ -193,7 +195,7 @@ void reshape(GLint w, GLint h) {
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(65.0, GLfloat(w) / GLfloat(h), 1.0, 20.0);
+	gluPerspective(65.0, GLfloat(w) / GLfloat(h), 1.0, 200.0);
 }
 void procKeys(unsigned char key, int x, int y)
 {
@@ -225,6 +227,8 @@ int main(int argc, char** argv) {
 	printf("\n\
 -----------------------------------------------------------------------\n\
  OpenGL Sample Program for a robot:\n\
+ - 'LEFT CLICK AND DRAG': Rotate \n\
+ - 'RIGHT CLICK AND DRAG': Rotate \n\
  - '1': show wireframe \n\
  - '2': show solid \n\
  - '3': toggle axis \n\
