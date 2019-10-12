@@ -31,9 +31,10 @@ static robot::bodypart
 	left_lowerleg,
 	right_lowerleg;
 
+static bool wireframe = true;
+static bool showAxis = true;
 
-static int shoulderAngle = 0, elbowAngle = 0;
-bool baxis = true;
+
 // Handles the keyboard event: the left and right arrows bend the elbow, the
 // up and down keys bend the shoulder.
 void special(int key, int, int) {
@@ -53,11 +54,11 @@ void special(int key, int, int) {
 // The calls to glPushMatrix and glPopMatrix are essential here; they enable
 // this function to be called from just about anywhere and guarantee that
 // the glScalef call does not pollute code that follows a call to myWireBox.
-void wireBox(GLdouble width, GLdouble height, GLdouble depth) {
+void solidBox(GLdouble width, GLdouble height, GLdouble depth) {
 	glPushMatrix();
 	glColor3f(1.0, 1.0, 1.0);
 	glScalef(width, height, depth);
-	glutWireCube(1.0);
+	glutSolidCube(1.0);
 	glPopMatrix();
 }
 
@@ -74,7 +75,7 @@ void drawScene()
 {
 	glPushMatrix();
 	// Draw the upper body at the orgin
-	wireBox(BODY_WIDTH, BODY_HEIGHT, BODY_DEPTH);
+	solidBox(BODY_WIDTH, BODY_HEIGHT, BODY_DEPTH);
 	// Draw the upper arm, rotated shoulder degrees about the z-axis. Note that
 	// the thing about glutWireBox is that normally its origin is in the middle
 	// of the box, but we want the "origin" of our box to be at the left end of
@@ -85,7 +86,7 @@ void drawScene()
 	glPushMatrix();
 
 		glTranslatef(0.0, 3.0, 0.0);
-		glutWireSphere(1.0, 50, 50);
+		glutSolidSphere(1.0, 50, 50);
 
 	glPopMatrix();
 	/*
@@ -166,8 +167,13 @@ void drawScene()
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
+
+	/*Render models as wireframe if enabled*/
+	if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else           glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	if (showAxis) drawAxes(); // draw axes
 	drawScene(); // draw a robot
-	drawAxes(); // draw axes
 	glFlush();
 }
 // Handles the reshape event by setting the viewport so that it takes up the
@@ -183,6 +189,9 @@ void reshape(GLint w, GLint h) {
 void procKeys(unsigned char key, int x, int y)
 {
 	switch (key) {
+		case '1':  wireframe = true; break;
+		case '2':  wireframe = false; break;
+		case '3':  showAxis = !showAxis; break;
 		case 'w':  left_upperleg.incrementAngle(); right_upperleg.incrementAngle(); break;
 		case 's':  left_upperleg.decrementAngle(); right_upperleg.decrementAngle(); break;
 		case 'a':  left_lowerleg.incrementAngle(); right_lowerleg.incrementAngle(); break;
@@ -208,6 +217,9 @@ int main(int argc, char** argv) {
 	printf("\n\
 -----------------------------------------------------------------------\n\
  OpenGL Sample Program for a robot:\n\
+ - '1': show wireframe \n\
+ - '2': show solid \n\
+ - '3': toggle axis \n\
  - 'w': increase the upper leg angle \n\
  - 's': decrease the upper leg angle \n\
  - 'a': increase the lower leg angle \n\
@@ -222,7 +234,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowPosition(80, 80);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("Robot Arm");
+	glutCreateWindow("Max Kotlan - Robot Arm");
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(procKeys);
