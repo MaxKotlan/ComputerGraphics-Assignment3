@@ -10,6 +10,7 @@
 #endif
 #include <stdio.h>
 
+#include "arcballcamera.h"
 #include "bodypart.h";
 
 #define BODY_WIDTH 2
@@ -74,6 +75,12 @@ void drawAxes()
 void drawScene()
 {
 	glPushMatrix();
+	
+	
+	gluLookAt(x, y, z, //camera is located at (x,y,z)
+		0, 0, 0, //camera is looking at (0,0,0)
+		0.0f, 1.0f, 0.0f); //up vector is (0,1,0) (positive Y)
+	
 	// Draw the upper body at the orgin
 	solidBox(BODY_WIDTH, BODY_HEIGHT, BODY_DEPTH);
 	// Draw the upper arm, rotated shoulder degrees about the z-axis. Note that
@@ -82,6 +89,7 @@ void drawScene()
 	// the box, so it needs to first be shifted 1 unit in the x direction, then
 	// rotated.
 	
+
 	/*Draws Head*/
 	glPushMatrix();
 
@@ -168,6 +176,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 
+
 	/*Render models as wireframe if enabled*/
 	if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else           glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -207,8 +216,7 @@ void init() {
 	glShadeModel(GL_FLAT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(1, 2, 8, 0, 0, 0, 0, 1, 0);
-
+	//gluLookAt(1, 2, 8, 0, 0, 0, 0, 1, 0);
 	left_forearm.setAngle(180);
 }
 // Initializes GLUT, the display mode, and main window; registers callbacks;
@@ -235,10 +243,18 @@ int main(int argc, char** argv) {
 	glutInitWindowPosition(80, 80);
 	glutInitWindowSize(800, 600);
 	glutCreateWindow("Max Kotlan - Robot Arm");
+
+	cameraRadius = 7.0f;
+	cameraTheta = 2.80;
+	cameraPhi = 2.0;
+	recomputeOrientation();
+
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(procKeys);
 	glutSpecialFunc(special);
+	glutMouseFunc(mouseCallback);
+	glutMotionFunc(mouseMotion);
 	init();
 	glutMainLoop();
 }
