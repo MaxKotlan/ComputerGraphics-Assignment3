@@ -14,7 +14,7 @@ namespace robot {
 	class bodypart {
 	private:
 		const int _angleIncrement = 5;
-		int _angle = 0.0;
+		int _angle = 0;
 
 		GLfloat _postion[3]		  = { 0.0, 0.0, 0.0 };
 		GLfloat _color[3]		  = { 1.0, 1.0, 1.0 };
@@ -23,6 +23,7 @@ namespace robot {
 
 	public:
 		void draw();
+		void setAngle(int newAngle);
 		void incrementAngle();
 		void decrementAngle();
 		void setPosition(GLfloat x, GLfloat y, GLfloat z);
@@ -32,14 +33,14 @@ namespace robot {
 
 void robot::bodypart::draw()
 {
-	//glPushMatrix();
-
 	glTranslatef(_postion[0], _postion[1], _postion[2]);
 	glRotatef((GLfloat)_angle, 0.0, 0.0, 1.0);
 	glTranslatef(_rotationPoint[0], _rotationPoint[1], _rotationPoint[2]);
 	wireBox(_size[0], _size[1], _size[2]);
-	//glPopMatrix();
 }
+
+inline void robot::bodypart::setAngle(int newAngle)
+{ _angle = newAngle; }
 
 inline void robot::bodypart::incrementAngle()
 { (_angle += _angleIncrement) %= 360; }

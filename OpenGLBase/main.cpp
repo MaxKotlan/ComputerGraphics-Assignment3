@@ -20,11 +20,15 @@
 // lower arm makes relative to the upper arm, called elbowAngle. These angles
 // are adjusted in 5 degree increments by a keyboard callback.
 
-static robot::bodypart 
-	  left_forearm, 
-	 right_forearm,
-	 left_upperarm,
-	right_upperarm;
+static robot::bodypart
+	left_forearm,
+	right_forearm,
+	left_upperarm,
+	right_upperarm,
+	left_upperleg,
+	right_upperleg,
+	left_lowerleg,
+	right_lowerleg;
 
 
 static int shoulderAngle = 0, elbowAngle = 0;
@@ -33,10 +37,11 @@ bool baxis = true;
 // up and down keys bend the shoulder.
 void special(int key, int, int) {
 	switch (key) {
-	case GLUT_KEY_LEFT:  left_forearm.incrementAngle();  right_forearm.incrementAngle();  break;
-	case GLUT_KEY_RIGHT: left_forearm.decrementAngle();  right_forearm.decrementAngle();  break;
-	case GLUT_KEY_UP:    left_upperarm.incrementAngle(); right_upperarm.incrementAngle(); break;
-	case GLUT_KEY_DOWN:  left_upperarm.decrementAngle(); right_upperarm.decrementAngle(); break;
+	case GLUT_KEY_LEFT:  left_forearm.incrementAngle();  right_forearm.decrementAngle();  break;
+	case GLUT_KEY_RIGHT: left_forearm.decrementAngle();  right_forearm.incrementAngle();  break;
+	case GLUT_KEY_UP:    left_upperarm.incrementAngle(); right_upperarm.decrementAngle(); break;
+	case GLUT_KEY_DOWN:  left_upperarm.decrementAngle(); right_upperarm.incrementAngle(); break;
+	case GLUT_KEY_END:   exit(0);
 	default: return;
 	}
 	glutPostRedisplay();
@@ -79,7 +84,12 @@ void drawScene()
 	//glRotatef((GLfloat)shoulderAngle, 0.0, 0.0, 1.0); //(3) then rotate shoulder
 	//glTranslatef(1.0, 0.0, 0.0); // (2) shift to the right on the x axis to have the left end at the origin
 	//wireBox(2.0, 0.4, 1.0); // (1) draw the upper arm box
+	glPushMatrix();
 
+		glTranslatef(0.0, 3.0, 0.0);
+		glutWireSphere(1.0, 50, 50);
+
+	glPopMatrix();
 	glPushMatrix();
 
 		right_upperarm.setPosition(1.0, 1.5, 0.0);
@@ -100,6 +110,20 @@ void drawScene()
 
 	glPopMatrix();
 
+	glPushMatrix();
+	glTranslatef(0.0, -2, 0.0);
+	glRotatef(90, 1.0, 0.0, 0.0);
+	glPushMatrix();
+		glRotatef(90, 0.0, -1.0, 0.0);
+		glPushMatrix();
+			right_upperleg.setPosition(0.8 * (BODY_WIDTH / 2.0), -(BODY_HEIGHT / 2.0), 0.0);
+			right_upperleg.draw();
+
+			right_lowerleg.setPosition(1.0, 0.0, 0.0);
+			right_lowerleg.draw();
+		glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
 
 	// Now we are ready to draw the lower arm. Since the lower arm is attached
 	// to the upper arm we put the code here so that all rotations we do are
@@ -140,10 +164,11 @@ void reshape(GLint w, GLint h) {
 void procKeys(unsigned char key, int x, int y)
 {
 	switch (key) {
-	case 'a': baxis = !baxis; // toggle on off drawing axes
-		printf("%d\n", baxis);
-		break;
-	case 27: exit(0); break;
+		case 'w':  left_upperleg.incrementAngle(); right_upperleg.incrementAngle(); break;
+		case 's':  left_upperleg.decrementAngle(); right_upperleg.decrementAngle(); break;
+		case 'a':  left_lowerleg.incrementAngle(); right_lowerleg.incrementAngle(); break;
+		case 'd':  left_lowerleg.decrementAngle(); right_lowerleg.decrementAngle(); break;
+		case 27: exit(0); break;
 	}
 	glutPostRedisplay();
 }
@@ -155,6 +180,8 @@ void init() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(1, 2, 8, 0, 0, 0, 0, 1, 0);
+
+	left_forearm.setAngle(180);
 }
 // Initializes GLUT, the display mode, and main window; registers callbacks;
 // does application initialization; enters the main event loop.
