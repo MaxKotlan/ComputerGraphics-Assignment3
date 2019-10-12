@@ -10,6 +10,8 @@
 #endif
 #include <stdio.h>
 
+#include "bodypart.h";
+
 #define BODY_WIDTH 2
 #define BODY_HEIGHT 4
 #define BODY_DEPTH 1
@@ -17,16 +19,24 @@
 // relative to the x-axis, called shoulderAngle, and (2) the angle that the
 // lower arm makes relative to the upper arm, called elbowAngle. These angles
 // are adjusted in 5 degree increments by a keyboard callback.
+
+static robot::bodypart 
+	  left_forearm, 
+	 right_forearm,
+	 left_upperarm,
+	right_upperarm;
+
+
 static int shoulderAngle = 0, elbowAngle = 0;
 bool baxis = true;
 // Handles the keyboard event: the left and right arrows bend the elbow, the
 // up and down keys bend the shoulder.
 void special(int key, int, int) {
 	switch (key) {
-	case GLUT_KEY_LEFT: (elbowAngle += 5) %= 360; break;
-	case GLUT_KEY_RIGHT: (elbowAngle -= 5) %= 360; break;
-	case GLUT_KEY_UP: (shoulderAngle += 5) %= 360; break;
-	case GLUT_KEY_DOWN: (shoulderAngle -= 5) %= 360; break;
+	case GLUT_KEY_LEFT:  left_forearm.incrementAngle();  right_forearm.incrementAngle();  break;
+	case GLUT_KEY_RIGHT: left_forearm.decrementAngle();  right_forearm.decrementAngle();  break;
+	case GLUT_KEY_UP:    left_upperarm.incrementAngle(); right_upperarm.incrementAngle(); break;
+	case GLUT_KEY_DOWN:  left_upperarm.decrementAngle(); right_upperarm.decrementAngle(); break;
 	default: return;
 	}
 	glutPostRedisplay();
@@ -64,10 +74,33 @@ void drawScene()
 	// of the box, but we want the "origin" of our box to be at the left end of
 	// the box, so it needs to first be shifted 1 unit in the x direction, then
 	// rotated.
-	glTranslatef(1.0, 1.5, 0.0); // (4) move to the right end of the upper body (attachment)
-	glRotatef((GLfloat)shoulderAngle, 0.0, 0.0, 1.0); //(3) then rotate shoulder
-	glTranslatef(1.0, 0.0, 0.0); // (2) shift to the right on the x axis to have the left end at the origin
-	wireBox(2.0, 0.4, 1.0); // (1) draw the upper arm box
+	
+	//glTranslatef(1.0, 1.5, 0.0); // (4) move to the right end of the upper body (attachment)
+	//glRotatef((GLfloat)shoulderAngle, 0.0, 0.0, 1.0); //(3) then rotate shoulder
+	//glTranslatef(1.0, 0.0, 0.0); // (2) shift to the right on the x axis to have the left end at the origin
+	//wireBox(2.0, 0.4, 1.0); // (1) draw the upper arm box
+
+	glPushMatrix();
+
+		right_upperarm.setPosition(1.0, 1.5, 0.0);
+		right_upperarm.draw();
+
+		right_forearm.setPosition(1.0, 0.0, 0.0);
+		right_forearm.draw();
+
+	glPopMatrix();
+	glPushMatrix();
+
+		left_upperarm.setPosition(-1.0, 1.5, 0.0);
+		left_upperarm.setRotationPoint(-1.0,0.0,0.0);
+		left_upperarm.draw();
+
+		left_forearm.setPosition(-1.0, 0.0, 0.0);
+		left_forearm.draw();
+
+	glPopMatrix();
+
+
 	// Now we are ready to draw the lower arm. Since the lower arm is attached
 	// to the upper arm we put the code here so that all rotations we do are
 	// relative to the rotation that we already made above to orient the upper
@@ -76,10 +109,10 @@ void drawScene()
 	// we translate <1,0,0> before rotating. But after rotating we have to
 	// position the lower arm at the end of the upper arm, so we have to
 	// translate it <1,0,0> again.
-	glTranslatef(1.0, 0.0, 0.0); // (4) move to the right end of the upper arm
-	glRotatef((GLfloat)elbowAngle, 0.0, 0.0, 1.0); // (3) rotate
-	glTranslatef(1.0, 0.0, 0.0); // (2) shift to the right on the x axis to have the left end at the origin
-	wireBox(2.0, 0.4, 1.0); // (1) draw the lower arm
+	//glTranslatef(1.0, 0.0, 0.0); // (4) move to the right end of the upper arm
+	//glRotatef((GLfloat)elbowAngle, 0.0, 0.0, 1.0); // (3) rotate
+	//glTranslatef(1.0, 0.0, 0.0); // (2) shift to the right on the x axis to have the left end at the origin
+	//wireBox(2.0, 0.4, 1.0); // (1) draw the lower arm
 	glPopMatrix();
 }
 // Displays the arm in its current position and orientation. The whole
