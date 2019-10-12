@@ -20,6 +20,7 @@
 // lower arm makes relative to the upper arm, called elbowAngle. These angles
 // are adjusted in 5 degree increments by a keyboard callback.
 
+/*Create a bunch of robot bodyparts*/
 static robot::bodypart
 	left_forearm,
 	right_forearm,
@@ -80,16 +81,19 @@ void drawScene()
 	// the box, so it needs to first be shifted 1 unit in the x direction, then
 	// rotated.
 	
-	//glTranslatef(1.0, 1.5, 0.0); // (4) move to the right end of the upper body (attachment)
-	//glRotatef((GLfloat)shoulderAngle, 0.0, 0.0, 1.0); //(3) then rotate shoulder
-	//glTranslatef(1.0, 0.0, 0.0); // (2) shift to the right on the x axis to have the left end at the origin
-	//wireBox(2.0, 0.4, 1.0); // (1) draw the upper arm box
+	/*Draws Head*/
 	glPushMatrix();
 
 		glTranslatef(0.0, 3.0, 0.0);
 		glutWireSphere(1.0, 50, 50);
 
 	glPopMatrix();
+	/*
+		Draws Right Arms
+		Both the forearm, and upperarm share the same rotation matrix,
+		because the rotation of the upperarm affects the final rotation of
+		the forearm. This is the same for the rest of the components.
+	*/
 	glPushMatrix();
 
 		right_upperarm.setPosition(1.0, 1.5, 0.0);
@@ -99,6 +103,11 @@ void drawScene()
 		right_forearm.draw();
 
 	glPopMatrix();
+
+	/*Same thing with this, although instead of applying another pushmatrix to mirror the
+	object, I made it adjust the angles, and center of rotation, just for my own practice.
+	Really, it would probably be easier to rotate the whole arm.
+	*/
 	glPushMatrix();
 
 		left_upperarm.setPosition(-1.0, 1.5, 0.0);
@@ -110,33 +119,43 @@ void drawScene()
 
 	glPopMatrix();
 
+	/*Since i didn't feel like figuring out the correct paramters to initalize the robot legs,
+	i used the same parameters as a robot arm, and applied a rotation, (using push and pop matricies),
+	to rotate the whole arm into the position of the leg. 
+	*/
 	glPushMatrix();
-	glTranslatef(0.0, -2, 0.0);
-	glRotatef(90, 1.0, 0.0, 0.0);
-	glPushMatrix();
-		glRotatef(90, 0.0, -1.0, 0.0);
+		glTranslatef(.8, -2.0, 0.0);
+		glRotatef(90, -1.0, 0.0, 0.0);
 		glPushMatrix();
-			right_upperleg.setPosition(0.8 * (BODY_WIDTH / 2.0), -(BODY_HEIGHT / 2.0), 0.0);
-			right_upperleg.draw();
+			glRotatef(90, 0.0, 1.0, 0.0);
+			glPushMatrix();
+				right_upperleg.setPosition(0.0, 0.0, 0.0);
+				right_upperleg.draw();
 
-			right_lowerleg.setPosition(1.0, 0.0, 0.0);
-			right_lowerleg.draw();
+				right_lowerleg.setPosition(1.0, 0.0, 0.0);
+				right_lowerleg.draw();
+			glPopMatrix();
 		glPopMatrix();
 	glPopMatrix();
+
+
+	/*Same thing with tis leg. Only thing is it is translated to the left, instead of the right.
+	*/
+	glPushMatrix();
+		glTranslatef(-.8, -2.0, 0.0);
+		glRotatef(90, -1.0, 0.0, 0.0);
+		glPushMatrix();
+			glRotatef(90, 0.0, 1.0, 0.0);
+			glPushMatrix();
+				left_upperleg.setPosition(0.0, 0.0, 0.0);
+				left_upperleg.draw();
+
+				left_lowerleg.setPosition(1.0, 0.0, 0.0);
+				left_lowerleg.draw();
+			glPopMatrix();
+		glPopMatrix();
 	glPopMatrix();
 
-	// Now we are ready to draw the lower arm. Since the lower arm is attached
-	// to the upper arm we put the code here so that all rotations we do are
-	// relative to the rotation that we already made above to orient the upper
-	// arm. So, we want to rotate elbow degrees about the z-axis. But, like
-	// before, the anchor point for the rotation is at the end of the box, so
-	// we translate <1,0,0> before rotating. But after rotating we have to
-	// position the lower arm at the end of the upper arm, so we have to
-	// translate it <1,0,0> again.
-	//glTranslatef(1.0, 0.0, 0.0); // (4) move to the right end of the upper arm
-	//glRotatef((GLfloat)elbowAngle, 0.0, 0.0, 1.0); // (3) rotate
-	//glTranslatef(1.0, 0.0, 0.0); // (2) shift to the right on the x axis to have the left end at the origin
-	//wireBox(2.0, 0.4, 1.0); // (1) draw the lower arm
 	glPopMatrix();
 }
 // Displays the arm in its current position and orientation. The whole
@@ -189,7 +208,10 @@ int main(int argc, char** argv) {
 	printf("\n\
 -----------------------------------------------------------------------\n\
  OpenGL Sample Program for a robot:\n\
- - 'a': toggle on off to draw axes \n\
+ - 'w': increase the upper leg angle \n\
+ - 's': decrease the upper leg angle \n\
+ - 'a': increase the lower leg angle \n\
+ - 'd': increase the lower leg angle \n\
  - LEFT ARROW: increment the elbowAngle \n\
  - RIGHT ARROW: decrement the elbowAngle \n\
  - UP ARROW: increment shoulderAngle \n\
