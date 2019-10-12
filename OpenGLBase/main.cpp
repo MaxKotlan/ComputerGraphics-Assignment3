@@ -5,8 +5,10 @@
 
 #ifdef __APPLE_CC__
 #include <GLUT/glut.h>
+#include <GLUT/freeglut.h>
 #else
 #include <GL/glut.h>
+#include <GL/freeglut.h>
 #endif
 #include <stdio.h>
 
@@ -21,7 +23,10 @@
 // lower arm makes relative to the upper arm, called elbowAngle. These angles
 // are adjusted in 5 degree increments by a keyboard callback.
 
-/*Create a bunch of robot bodyparts*/
+/*Create a bunch of robot bodyparts
+Each bodypart has a unique position and rotation,
+that can be changed with a couple different functions I added.
+*/
 static robot::bodypart
 	left_forearm,
 	right_forearm,
@@ -151,7 +156,7 @@ void drawScene()
 	glPopMatrix();
 
 
-	/*Same thing with tis leg. Only thing is it is translated to the left, instead of the right.
+	/*Same thing with tis leg. Only thing is it is translated slightly to the left, instead of slightly the right.
 	*/
 	glPushMatrix();
 		glTranslatef(-.8, -2.0, 0.0);
@@ -218,7 +223,6 @@ void init() {
 	glShadeModel(GL_FLAT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	//gluLookAt(1, 2, 8, 0, 0, 0, 0, 1, 0);
 	left_forearm.setAngle(180);
 }
 // Initializes GLUT, the display mode, and main window; registers callbacks;
@@ -228,7 +232,8 @@ int main(int argc, char** argv) {
 -----------------------------------------------------------------------\n\
  OpenGL Sample Program for a robot:\n\
  - 'LEFT CLICK AND DRAG': Rotate \n\
- - 'RIGHT CLICK AND DRAG': Rotate \n\
+ - 'RIGHT CLICK AND DRAG': ZOOM \n\
+ - 'MIDDLE MOUSE': ZOOM \n\
  - '1': show wireframe \n\
  - '2': show solid \n\
  - '3': toggle axis \n\
@@ -259,6 +264,8 @@ int main(int argc, char** argv) {
 	glutSpecialFunc(special);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(mouseMotion);
+	glutMouseWheelFunc(mouseWheel);
+
 	init();
 	glutMainLoop();
 }

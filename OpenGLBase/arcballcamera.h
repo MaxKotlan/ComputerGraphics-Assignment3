@@ -10,9 +10,12 @@
 #include <math.h>
 #define PI 3.141592
 /*
-This file was mainly copied from the lecture notes,
+This file was copied from the lecture notes,
 CG_L12_13_std_updated. I put it in a seperate file,
-because main was getting unorganized
+because main was getting unorganized.
+
+The only thing I changed, was adding the mouseWheel function
+in order to zoom in when scrolling
 */
 
 
@@ -68,4 +71,20 @@ void mouseMotion(int x, int y)
 	mouseX = x;
 	mouseY = y;
 }
+
+void mouseWheel(int button, int dir, int x, int y)
+{
+	if (dir > 0)
+	{
+		cameraRadius--;
+		if (cameraRadius < 2.0) cameraRadius = 2.0;
+	}
+	else
+	{
+		cameraRadius++;
+		if (cameraRadius > 300.0) cameraRadius = 300.0;
+	}
+	recomputeOrientation();
+}
+
 #endif
